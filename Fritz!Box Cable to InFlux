@@ -70,7 +70,7 @@ echo "Upstreamwerte ermitteln und abschicken"
 
 for (( channel=0; channel<=$kanaeleup-1; channel++ )) 
 	do 	
-		ChannelID[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis30[$channel].channel")
+		ChannelID[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis30[$channel].channelID")
 		Freq[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis30[$channel].frequency")
 		Type[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis30[$channel].type")
 		Powerlevel[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis30[$channel].powerLevel")
@@ -82,7 +82,7 @@ echo "Downstreamwerte ermitteln und abschicken"
 
 for (( channel=0; channel<=$kanaeledown-1; channel++ )) 
 	do 	
-		ChannelID[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis30[$channel].channel")
+		ChannelID[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis30[$channel].channelID")
 		Freq[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis30[$channel].frequency")
 		Type[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis30[$channel].type")
 		Powerlevel[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis30[$channel].powerLevel") 
@@ -99,7 +99,7 @@ echo "Downstreamwerte 3.1 ermitteln und abschicken"
 
 for (( channel=0; channel<=$kanaeledown31-1; channel++ )) 
 	do 	
-		ChannelID[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].channel")
+		ChannelID[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].channelID")
 		Powerlevel[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].powerLevel") 
 
 	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.1 Freq=$Freq,Powerlevel=$Powerlevel" >> /tmp/modem.txt
