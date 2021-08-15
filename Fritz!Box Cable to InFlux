@@ -4,10 +4,6 @@ user="admin"
 pass="xxx"
 sidfile=/tmp/$fritzbox.sid
 
-IP="fritz.box"
-FBUID="admin"
-SECRET="xxx"
-
 while true; do
     sleep 15
 
@@ -24,16 +20,16 @@ result=$(curl -s "http://$fritzbox/login_sid.lua?sid=$sid" | grep -c "0000000000
 if [[ $result -gt 0 ]]
 then
 
-CHALLENGE=`wget --no-check-certificate -O - "http://$IP/login_sid.lua" 2>/dev/null | sed 's/.*<Challenge>\(.*\)<\/Challenge>.*/\1/'`
+CHALLENGE=`wget --no-check-certificate -O - "http://$fritzbox/login_sid.lua" 2>/dev/null | sed 's/.*<Challenge>\(.*\)<\/Challenge>.*/\1/'`
 
-CPSTR="$CHALLENGE-$SECRET"
+CPSTR="$CHALLENGE-$pass"
 
 MD5=`echo -n $CPSTR | iconv -f ISO8859-1 -t UTF-16LE | md5sum -b | awk '{print substr($0,1,32)}'`
 RESPONSE="$CHALLENGE-$MD5"
 
-URL_PARAMS="username=$FBUID&response=$RESPONSE"
+URL_PARAMS="username=$user&response=$RESPONSE"
 
-sid=`wget --no-check-certificate -O - "https://$IP/login_sid.lua?$URL_PARAMS" 2>/dev/null | sed 's/.*<SID>\(.*\)<\/SID>.*/\1/'`
+sid=`wget --no-check-certificate -O - "https://$fritzbox/login_sid.lua?$URL_PARAMS" 2>/dev/null | sed 's/.*<SID>\(.*\)<\/SID>.*/\1/'`
 rm $sidfile
 touch $sidfile
 
@@ -116,4 +112,3 @@ echo "Werte in die Influx laden"
 curl -i -XPOST "https://maulberry:8086/write?db=DOCSIS&u=admin&p=xxx" --insecure --data-binary @/tmp/modem.txt
 
 done
-
