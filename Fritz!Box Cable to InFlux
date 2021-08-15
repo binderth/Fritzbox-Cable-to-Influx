@@ -75,8 +75,8 @@ for (( channel=0; channel<=$kanaeleup-1; channel++ ))
 		Type[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis30[$channel].type")
 		Powerlevel[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis30[$channel].powerLevel")
 
- 	echo "Upstream,USChannelID=$ChannelID,DOCSIS=3.0,Type=$Type Freq=$Freq,Powerlevel=$Powerlevel"
-	echo "Upstream,USChannelID=$ChannelID,DOCSIS=3.0,Type=$Type Freq=$Freq,Powerlevel=$Powerlevel" >> /tmp/modem.txt
+ 	echo "Upstream,USChannelID=$ChannelID,DOCSIS=3.0,Type=$Type,Freq=$Freq Powerlevel=$Powerlevel"
+	echo "Upstream,USChannelID=$ChannelID,DOCSIS=3.0,Type=$Type,Freq=$Freq Powerlevel=$Powerlevel" >> /tmp/modem.txt
 done
 
 echo "Downstreamwerte ermitteln"
@@ -92,8 +92,8 @@ for (( channel=0; channel<=$kanaeledown-1; channel++ ))
 		nonCorrErrors[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis30[$channel].nonCorrErrors")
 		corrErrors[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis30[$channel].corrErrors") 
 
-	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.0,Type=$Type Freq=$Freq,Powerlevel=$Powerlevel,corrErrors=$corrErrors,nonCorrErrors=$nonCorrErrors,mse=$mse"
-	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.0,Type=$Type Freq=$Freq,Powerlevel=$Powerlevel,corrErrors=$corrErrors,nonCorrErrors=$nonCorrErrors,mse=$mse" >> /tmp/modem.txt
+	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.0,Type=$Type,Freq=$Freq Powerlevel=$Powerlevel,corrErrors=$corrErrors,nonCorrErrors=$nonCorrErrors,mse=$mse"
+	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.0,Type=$Type,Freq=$Freq Powerlevel=$Powerlevel,corrErrors=$corrErrors,nonCorrErrors=$nonCorrErrors,mse=$mse" >> /tmp/modem.txt
 done
 
 echo "Downstreamwerte 3.1"
@@ -104,8 +104,8 @@ for (( channel=0; channel<=$kanaeledown31-1; channel++ ))
 		Powerlevel[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].powerLevel")
 		Type[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].type") 
 			
-	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.1,Type=$Type Freq=$Freq,Powerlevel=$Powerlevel"
-	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.1,Type=$Type Freq=$Freq,Powerlevel=$Powerlevel" >> /tmp/modem.txt
+	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.1,Type=$Type,Freq=$Freq Powerlevel=$Powerlevel"
+	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.1,Type=$Type,Freq=$Freq Powerlevel=$Powerlevel" >> /tmp/modem.txt
 done
 
 echo "Werte in die Influx laden"
