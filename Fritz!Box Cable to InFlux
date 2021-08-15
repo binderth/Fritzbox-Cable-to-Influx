@@ -1,11 +1,11 @@
 #!/bin/bash
 fritzbox="fritz.box"
-user="xxx"
+user="admin"
 pass="xxx"
 sidfile=/tmp/$fritzbox.sid
 
 IP="fritz.box"
-FBUID="xxx"
+FBUID="admin"
 SECRET="xxx"
 
 while true; do
@@ -34,9 +34,12 @@ RESPONSE="$CHALLENGE-$MD5"
 URL_PARAMS="username=$FBUID&response=$RESPONSE"
 
 sid=`wget --no-check-certificate -O - "https://$IP/login_sid.lua?$URL_PARAMS" 2>/dev/null | sed 's/.*<SID>\(.*\)<\/SID>.*/\1/'`
+rm $sidfile
+touch $sidfile
+
+echo $sid
 echo $sid >> $sidfile 
 fi
-
 sid=$(cat $sidfile)
 
 
@@ -62,11 +65,12 @@ kanaeledown=$(/bin/echo ${docsis} | /usr/bin/jq ".data.channelDs.docsis30[].powe
 echo "Anzahl Downstream-Kanäle 3.1 ermitteln"
 kanaeledown31=$(/bin/echo ${docsis} | /usr/bin/jq ".data.channelDs.docsis31[].powerLevel" | wc -l)
 
+echo $kanaeleup $kanaeledown $kanaeledown31
 
 #echo "Upstream DOCSIS 3.1"
 # TODO
 
-echo "Upstreamwerte ermitteln und abschicken"
+echo "Upstreamwerte ermitteln"
 
 for (( channel=0; channel<=$kanaeleup-1; channel++ )) 
 	do 	
@@ -74,11 +78,12 @@ for (( channel=0; channel<=$kanaeleup-1; channel++ ))
 		Freq[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis30[$channel].frequency")
 		Type[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis30[$channel].type")
 		Powerlevel[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis30[$channel].powerLevel")
- 
-	echo "Upstream,USChannelID=$ChannelID,DOCSIS=3.0 Freq=$Freq,Powerlevel=$Powerlevel" >> /tmp/modem.txt
+
+ 	echo "Upstream,USChannelID=$ChannelID,DOCSIS=3.0,Type=$Type Freq=$Freq,Powerlevel=$Powerlevel"
+	echo "Upstream,USChannelID=$ChannelID,DOCSIS=3.0,Type=$Type Freq=$Freq,Powerlevel=$Powerlevel" >> /tmp/modem.txt
 done
 
-echo "Downstreamwerte ermitteln und abschicken"
+echo "Downstreamwerte ermitteln"
 
 for (( channel=0; channel<=$kanaeledown-1; channel++ )) 
 	do 	
@@ -91,21 +96,24 @@ for (( channel=0; channel<=$kanaeledown-1; channel++ ))
 		nonCorrErrors[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis30[$channel].nonCorrErrors")
 		corrErrors[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis30[$channel].corrErrors") 
 
-	
-	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.0 Freq=$Freq,Powerlevel=$Powerlevel,corrErrors=$corrErrors,nonCorrErrors=$nonCorrErrors,mse=$mse" >> /tmp/modem.txt
+	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.0,Type=$Type Freq=$Freq,Powerlevel=$Powerlevel,corrErrors=$corrErrors,nonCorrErrors=$nonCorrErrors,mse=$mse"
+	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.0,Type=$Type Freq=$Freq,Powerlevel=$Powerlevel,corrErrors=$corrErrors,nonCorrErrors=$nonCorrErrors,mse=$mse" >> /tmp/modem.txt
 done
 
-echo "Downstreamwerte 3.1 ermitteln und abschicken"
+echo "Downstreamwerte 3.1"
 
 for (( channel=0; channel<=$kanaeledown31-1; channel++ )) 
 	do 	
 		ChannelID[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].channelID")
-		Powerlevel[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].powerLevel") 
-
-	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.1 Freq=$Freq,Powerlevel=$Powerlevel" >> /tmp/modem.txt
+		Powerlevel[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].powerLevel")
+		Type[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].type") 
+			
+	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.1,Type=$Type Freq=$Freq,Powerlevel=$Powerlevel"
+	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.1,Type=$Type Freq=$Freq,Powerlevel=$Powerlevel" >> /tmp/modem.txt
 done
 
-curl -i -XPOST "https://maulberry:8086/write?db=DOCSIS&u=XXX&p=XXX" --insecure --data-binary @/tmp/modem.txt
+echo "Werte in die Influx laden"
+curl -i -XPOST "https://maulberry:8086/write?db=DOCSIS&u=admin&p=xxx" --insecure --data-binary @/tmp/modem.txt
 
 done
 
