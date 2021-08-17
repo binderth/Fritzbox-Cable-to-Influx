@@ -102,7 +102,10 @@ for (( channel=0; channel<=$kanaeledown31-1; channel++ ))
 	do 	
 		ChannelID[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].channelID")
 		Powerlevel[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].powerLevel")
-		Type[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].type") 
+		Type[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].type")
+		Freq[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].frequency")
+
+		Freq=$(echo $Freq | tr -d ' ')
 			
 	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.1,Type=$Type,Freq=$Freq Powerlevel=$Powerlevel"
 	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.1,Type=$Type,Freq=$Freq Powerlevel=$Powerlevel" >> /tmp/modem.txt
