@@ -42,8 +42,9 @@ sid=$(cat $sidfile)
 echo "DOCSIS-Infos holen und in Variable ablegen"
 docsis=$(curl -s "http://$fritzbox/data.lua" -d "xhr=1&sid=$sid&lang=de&page=docInfo&xhrId=all&no_sidrenew")
 #echo $docsis
-# Globale Daten holen
-# energy=$(curl -s "http://$fritzbox/data.lua" -d "xhr=1&sid=$sid&lang=de&page=ecoStat&xhrId=all&no_sidrenew")
+ 
+echo "Globale Daten holen"
+energy=$(curl -s "http://$fritzbox/data.lua" -d "xhr=1&sid=$sid&lang=de&page=ecoStat&xhrId=all&no_sidrenew")
 
 
 echo "Ausgabedatei anlegen"
@@ -62,6 +63,7 @@ echo "Anzahl Downstream-Kanäle 3.1 ermitteln"
 kanaeledown31=$(/bin/echo ${docsis} | /usr/bin/jq ".data.channelDs.docsis31[].powerLevel" | wc -l)
 
 echo $kanaeleup $kanaeledown $kanaeledown31
+echo "channels sumup=$kanaeleup,sumdown=$kanaeledown,sumdown31=$kanaeledown31" >> /tmp/modem.txt
 
 #echo "Upstream DOCSIS 3.1"
 # TODO
@@ -111,7 +113,19 @@ for (( channel=0; channel<=$kanaeledown31-1; channel++ ))
 	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.1,Type=$Type,Freq=$Freq Powerlevel=$Powerlevel" >> /tmp/modem.txt
 done
 
+
+echo "Fritz!Box Stats ermitteln"
+fritzbox_cable_cpuusage=$(/bin/echo ${energy} | /usr/bin/jq -r '.data.cpuutil.series[0] | last')
+fritzbox_cable_cputemp=$(/bin/echo ${energy} | /usr/bin/jq -r '.data.cputemp.series[0] | last')
+fritzbox_cable_ramfree=$(/bin/echo ${energy} | /usr/bin/jq -r '.data.ramusage.series[2] | last')
+
+echo "FritzBox CPUusage=$fritzbox_cable_cpuusage,CPUtemp=$fritzbox_cable_cputemp,RAMfree=$fritzbox_cable_ramfree"
+echo "FritzBox CPUusage=$fritzbox_cable_cpuusage,CPUtemp=$fritzbox_cable_cputemp,RAMfree=$fritzbox_cable_ramfree" >> /tmp/modem.txt
+
+echo $energy >> /tmp/fb.txt
+
 echo "Werte in die Influx laden"
 curl -i -XPOST "https://maulberry:8086/write?db=DOCSIS&u=admin&p=xxx" --insecure --data-binary @/tmp/modem.txt
 
 done
+
