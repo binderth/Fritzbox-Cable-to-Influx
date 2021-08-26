@@ -41,7 +41,8 @@ sid=$(cat $sidfile)
 
 echo "DOCSIS-Infos holen und in Variable ablegen"
 docsis=$(curl -s "http://$fritzbox/data.lua" -d "xhr=1&sid=$sid&lang=de&page=docInfo&xhrId=all&no_sidrenew")
-#echo $docsis
+
+echo $docsis > /tmp/modem_raw.txt
  
 echo "Globale Daten holen"
 energy=$(curl -s "http://$fritzbox/data.lua" -d "xhr=1&sid=$sid&lang=de&page=ecoStat&xhrId=all&no_sidrenew")
@@ -56,17 +57,33 @@ touch /tmp/modem.txt
 echo "Anzahl Upstream-Kanäle ermitteln"
 kanaeleup=$(/bin/echo ${docsis} | /usr/bin/jq ".data.channelUs.docsis30[].powerLevel" | wc -l)
 
+echo "Anzahl Upstream-Kanäle 3.1 ermitteln"
+kanaeleup31=$(/bin/echo ${docsis} | /usr/bin/jq ".data.channelUs.docsis31[].powerLevel" | wc -l)
+
 echo "Anzahl Downstream-Kanäle ermitteln"
 kanaeledown=$(/bin/echo ${docsis} | /usr/bin/jq ".data.channelDs.docsis30[].powerLevel" | wc -l)
 
 echo "Anzahl Downstream-Kanäle 3.1 ermitteln"
 kanaeledown31=$(/bin/echo ${docsis} | /usr/bin/jq ".data.channelDs.docsis31[].powerLevel" | wc -l)
 
-echo $kanaeleup $kanaeledown $kanaeledown31
-echo "channels sumup=$kanaeleup,sumdown=$kanaeledown,sumdown31=$kanaeledown31" >> /tmp/modem.txt
+echo $kanaeleup $kanaeleup31 $kanaeledown $kanaeledown31
+echo "channels sumup=$kanaeleup,sumup31=$kanaeleup31,sumdown=$kanaeledown,sumdown31=$kanaeledown31" >> /tmp/modem.txt
 
-#echo "Upstream DOCSIS 3.1"
-# TODO
+echo "Upstream DOCSIS 3.1 ermitteln"
+
+for (( channel=0; channel<=$kanaeleup31-1; channel++ )) 
+	do 	
+		ChannelID[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis31[$channel].channelID")
+		Powerlevel[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis31[$channel].powerLevel")
+		Type[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis31[$channel].type")
+		Freq[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis31[$channel].frequency")
+
+		Freq=$(echo $Freq | tr -d ' ')
+			
+	echo "Upstream,USChannelID=$ChannelID,DOCSIS=3.1,Type=$Type,Freq=$Freq Powerlevel=$Powerlevel"
+	echo "Upstream,USChannelID=$ChannelID,DOCSIS=3.1,Type=$Type,Freq=$Freq Powerlevel=$Powerlevel" >> /tmp/modem.txt
+done
+
 
 echo "Upstreamwerte ermitteln"
 
@@ -98,7 +115,7 @@ for (( channel=0; channel<=$kanaeledown-1; channel++ ))
 	echo "Downstream,DSChannelID=$ChannelID,DOCSIS=3.0,Type=$Type,Freq=$Freq Powerlevel=$Powerlevel,corrErrors=$corrErrors,nonCorrErrors=$nonCorrErrors,mse=$mse" >> /tmp/modem.txt
 done
 
-echo "Downstreamwerte 3.1"
+echo "Downstreamwerte 3.1 ermitteln"
 
 for (( channel=0; channel<=$kanaeledown31-1; channel++ )) 
 	do 	
