@@ -2,6 +2,10 @@
 fritzbox="fritz.box"
 user="admin"
 pass="xxx"
+influx_server="http://192.168.xx.xx:8086"
+influx_org="ORG"
+influx_bucket="BUCKET"
+influx_hash="HASH"
 sidfile=/tmp/$fritzbox.sid
 
 while true; do
@@ -142,6 +146,6 @@ echo "FritzBox CPUusage=$fritzbox_cable_cpuusage,CPUtemp=$fritzbox_cable_cputemp
 echo "FritzBox CPUusage=$fritzbox_cable_cpuusage,CPUtemp=$fritzbox_cable_cputemp,RAMfree=$fritzbox_cable_ramfree" >> /tmp/modem.txt
 
 echo "Werte in die Influx laden"
-curl -i -XPOST "https://maulberry:8086/write?db=DOCSIS&u=admin&p=xxx" --insecure --data-binary @/tmp/modem.txt
+curl --request POST "$influx_server/api/v2/write?org=$influx_org&bucket=$influx_bucket&precision=ns" --header "Authorization: Token $influx_token" --header "Content-Type: text/plain; charset=utf-8"  --header "Accept: application/json"   --data-binary @/tmp/modem.txt
 
 done
