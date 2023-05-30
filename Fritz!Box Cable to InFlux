@@ -81,7 +81,7 @@ for (( channel=0; channel<=$kanaeleup31-1; channel++ ))
 	do 	
 		ChannelID[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis31[$channel].channelID")
 		Powerlevel[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis31[$channel].powerLevel")
-		Type[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis31[$channel].type")
+		Type[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis31[$channel].modulation")
 		Freq[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis31[$channel].frequency")
 
 		Freq=$(echo $Freq | tr -d ' ')
@@ -97,7 +97,7 @@ for (( channel=0; channel<=$kanaeleup-1; channel++ ))
 	do 	
 		ChannelID[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis30[$channel].channelID")
 		Freq[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis30[$channel].frequency")
-		Type[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis30[$channel].type")
+		Type[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis30[$channel].modulation")
 		Powerlevel[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelUs.docsis30[$channel].powerLevel")
 
  	echo "Upstream,USChannelID=$ChannelID,DOCSIS=3.0,Type=$Type,Freq=$Freq Powerlevel=$Powerlevel"
@@ -110,7 +110,7 @@ for (( channel=0; channel<=$kanaeledown-1; channel++ ))
 	do 	
 		ChannelID[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis30[$channel].channelID")
 		Freq[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis30[$channel].frequency")
-		Type[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis30[$channel].type")
+		Type[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis30[$channel].modulation")
 		Powerlevel[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis30[$channel].powerLevel") 
 
 		mse[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis30[$channel].mse")
@@ -127,7 +127,7 @@ for (( channel=0; channel<=$kanaeledown31-1; channel++ ))
 	do 	
 		ChannelID[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].channelID")
 		Powerlevel[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].powerLevel")
-		Type[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].type")
+		Type[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].modulation")
 		Freq[$c]=$(/bin/echo ${docsis} | /usr/bin/jq -r ".data.channelDs.docsis31[$channel].frequency")
 
 		Freq=$(echo $Freq | tr -d ' ')
